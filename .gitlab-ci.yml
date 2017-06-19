@@ -6,20 +6,19 @@ variables:
 stages:
   - test
   - build
-  - register
 
 unittest:
   stage: test
   script:
     - pip install -r app/requirements.txt
-    - python app/test
+    - python app/test.py
 
 build_docker_image:
   stage: build
   script:
-    - docker login -u gitlab-ci-token - $CI_BUILD_TOKEN $REGISTRY
-    - docker build -t $REGISTRY/flask-test-for-gitlab .
-    - docker push test-registry.pooq.co.kr/flask-test-for-gitlab
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/$CI_REGISTRY_USER/$CI_PROJECT_NAME .
+    - docker push $CI_REGISTRY/flask-test-for-gitlab
   tags:
     - stage
 
