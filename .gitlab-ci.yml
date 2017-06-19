@@ -1,0 +1,25 @@
+image: python:3.6
+
+variables:
+  REGISTRY: test-registry.pooq.co.kr
+
+stages:
+  - test
+  - build
+  - register
+
+unittest:
+  stage: test
+  script:
+    - pip install -r app/requirements.txt
+    - python app/test
+
+build_docker_image:
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token - $CI_BUILD_TOKEN $REGISTRY
+    - docker build -t $REGISTRY/flask-test-for-gitlab .
+    - docker push test-registry.pooq.co.kr/flask-test-for-gitlab
+  tags:
+    - stage
+
