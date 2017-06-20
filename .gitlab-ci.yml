@@ -23,19 +23,15 @@ build_image:
 
 unittest1:
   stage: test
-  variables:
-    MODE: TEST1
   script:
     - docker pull $TEST_IMAGE_TAG
-    - docker run --rm --entrypoint="python test1.py" $TEST_IMAGE_TAG
+    - docker run --rm -e "MODE=TEST1" $TEST_IMAGE_TAG
 
 unittest2:
   stage: test
-  variables:
-    MODE: TEST2
   script:
     - docker pull $TEST_IMAGE_TAG
-    - docker run --rm --entrypoint="python test2.py" $TEST_IMAGE_TAG
+    - docker run --rm -e "MODE=TEST2" $TEST_IMAGE_TAG
 
 release-image:
   stage: release
