@@ -10,12 +10,9 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   TEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:test
-  RELEASE_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  RELEASE_IMAGE_TAG: $CI_REGISTRY_IMAGE:CI_COMMIT_SHA
 
 before_script:
-  - echo $CI_REGISTRY
-  - echo $CI_JOB_TOKEN
-  - echo $RELEASE_IMAGE_TAG
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
 build_image:
