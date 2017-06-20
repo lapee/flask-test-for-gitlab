@@ -25,13 +25,13 @@ unittest1:
   stage: test
   script:
     - docker pull $TEST_IMAGE_TAG
-    - docker run $TEST_IMAGE_TAG python test1.py
+    - docker run -rm --entrypoint="python test1.py" $TEST_IMAGE_TAG
 
 unittest2:
   stage: test
   script:
     - docker pull $TEST_IMAGE_TAG
-    - docker run $TEST_IMAGE_TAG python test2.py
+    - docker run -rm --entrypoint="python test2.py" $TEST_IMAGE_TAG
 
 release-image:
   stage: release
