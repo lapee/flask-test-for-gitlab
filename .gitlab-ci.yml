@@ -1,6 +1,9 @@
-image: docker:latest
-services:
-  - docker:dind
+.docker_job_template: &dind_job
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
 stages:
   - build
@@ -14,9 +17,8 @@ variables:
   LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
 
 build_image:
+  <<: *dind_job
   stage: build
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker build --pull -t $COMMIT_IMAGE_TAG .
     - docker push $COMMIT_IMAGE_TAG
@@ -25,25 +27,22 @@ build_image:
     name: $CI_PROJECT_NAME
 
 unittest1:
+  <<: *dind_job
   stage: test
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker run --rm -e "MODE=TEST1" $COMMIT_IMAGE_TAG
 
 unittest2:
+  <<: *dind_job
   stage: test
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker run --rm -e "MODE=TEST2" $COMMIT_IMAGE_TAG
 
 release-image:
+  <<: *dind_job
   stage: release
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker tag $COMMIT_IMAGE_TAG $LATEST_IMAGE_TAG
