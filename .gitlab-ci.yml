@@ -22,9 +22,6 @@ build_image:
   script:
     - docker build --pull -t $COMMIT_IMAGE_TAG .
     - docker push $COMMIT_IMAGE_TAG
-    - echo $CI_ENVIRONMENT_SLUG
-  environment:
-    name: $CI_PROJECT_NAME
 
 unittest1:
   <<: *dind_job
@@ -53,12 +50,17 @@ release-image:
 deploy-to-kubernetes:
   image: test-gitlab-02-registery.pooq.co.kr/test-kube/kubectl-xenial:latest
   stage: deploy
-  before_script:
-   - sh kubectl-setup.sh
   script:
     - kubectl cluster-info
     - kubectl get pods
     - ls -l
+    - echo $DEPLOYMENT
+    - echo $POD
+    - kubectl set image deployment/$DEPLOYMENT $POD=$COMMIT_IMAGE_TAG
+    - kubectl rollout status deployment/$DEPLOYMENT
+  variables:
+    DEPLOYMENT: $CI_PROJECT_NAME-deployment
+    POD: $CI_PROJECT_NAME-pod
   only:
     - master
   when: manual
