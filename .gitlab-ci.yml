@@ -51,11 +51,7 @@ deploy-to-kubernetes:
   image: test-gitlab-02-registery.pooq.co.kr/test-kube/kubectl-xenial:latest
   stage: deploy
   script:
-    - kubectl cluster-info
-    - kubectl get pods
-    - ls -l
-    - echo $DEPLOYMENT
-    - echo $POD
+    - echo "update image to $COMMIT_IMAGE_TAG"
     - kubectl set image deployment/$DEPLOYMENT $POD=$COMMIT_IMAGE_TAG
     - kubectl rollout status deployment/$DEPLOYMENT
   variables:
