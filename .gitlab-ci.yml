@@ -15,13 +15,15 @@ variables:
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - echo $CI_ENVIRONMENT_SLUG
 
 build_image:
   stage: build
   script:
     - docker build --pull -t $COMMIT_IMAGE_TAG .
     - docker push $COMMIT_IMAGE_TAG
+    - echo $CI_ENVIRONMENT_SLUG
+  environment:
+    name: $CI_PROJECT_NAME
 
 unittest1:
   stage: test
