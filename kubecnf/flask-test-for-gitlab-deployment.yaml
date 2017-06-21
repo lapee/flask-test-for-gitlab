@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: flask-test-for-gitlab-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: flask-test-for-gitlab
+        tier: frontend
+    spec:
+      containers:
+      - name: flask-test-for-gitlab-pod
+        image: test-gitlab-02-registery.pooq.co.kr/test-kube/flask-test-for-gitlab
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 5000
+      imagePullSecrets:
+        - name: gitlab-cr-secret

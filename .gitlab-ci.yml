@@ -51,17 +51,13 @@ release-image:
     - master
 
 deploy-to-kubernetes:
-  image: lapee79/kubectl-xenial:1.6.5
+  image: test-gitlab-02-registery.pooq.co.kr/test-kube/kubectl-xenial:latest
   stage: deploy
   before_script:
-   - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
-   - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
-   - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
-   - kubectl config use-context "$CI_PROJECT_ID"
+   - sh kubectl-setup.sh
   script:
-    - echo $KUBE_URL
-    - echo $KUBE_TOKEN
-    - echo $KUBE_NAMESPACE
+    - kubectl cluster-info
+    - kubectl get pods
     - ls -l
   only:
     - master
