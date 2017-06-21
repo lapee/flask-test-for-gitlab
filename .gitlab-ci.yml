@@ -59,6 +59,9 @@ deploy-to-kubernetes:
    - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
    - kubectl config use-context "$CI_PROJECT_ID"
   script:
+    - echo $KUBE_URL
+    - echo $KUBE_TOKEN
+    - echo $KUBE_NAMESPACE
     - kubectl cluster-info
   only:
     - master
