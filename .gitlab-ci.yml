@@ -51,7 +51,7 @@ release-image:
   only:
     - master
 
-deploy-to-kubernetes
+deploy-to-kubernetes:
   image: lapee79/kubectl-xenial:1.6.5
   stage: deploy
   before_script:
