@@ -9,35 +9,36 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  TEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:test
-  RELEASE_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  COMMIT_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - echo $CI_ENVIRONMENT_SLUG
 
 build_image:
   stage: build
   script:
-    - docker build --pull -t $TEST_IMAGE_TAG .
-    - docker push $TEST_IMAGE_TAG
+    - docker build --pull -t $COMMIT_IMAGE_TAG .
+    - docker push $COMMIT_IMAGE_TAG
 
 unittest1:
   stage: test
   script:
-    - docker pull $TEST_IMAGE_TAG
-    - docker run --rm -e "MODE=TEST1" $TEST_IMAGE_TAG
+    - docker pull $COMMIT_IMAGE_TAG
+    - docker run --rm -e "MODE=TEST1" $COMMIT_IMAGE_TAG
 
 unittest2:
   stage: test
   script:
-    - docker pull $TEST_IMAGE_TAG
-    - docker run --rm -e "MODE=TEST2" $TEST_IMAGE_TAG
+    - docker pull $COMMIT_IMAGE_TAG
+    - docker run --rm -e "MODE=TEST2" $COMMIT_IMAGE_TAG
 
 release-image:
   stage: release
   script:
-    - docker pull $TEST_IMAGE_TAG
-    - docker tag $TEST_IMAGE_TAG $RELEASE_IMAGE_TAG
-    - docker push $RELEASE_IMAGE_TAG
+    - docker pull $COMMIT_IMAGE_TAG
+    - docker tag $COMMIT_IMAGE_TAG $LATEST_IMAGE_TAG
+    - docker push $LATEST_IMAGE_TAG
   only:
     - master
