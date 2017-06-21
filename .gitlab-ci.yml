@@ -6,18 +6,17 @@ stages:
   - build
   - test
   - release
+  - deploy
 
 variables:
   DOCKER_DRIVER: overlay2
-  CI_ENVIRONMENT_NAME: nametest01
   COMMIT_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
 
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-
 build_image:
   stage: build
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker build --pull -t $COMMIT_IMAGE_TAG .
     - docker push $COMMIT_IMAGE_TAG
@@ -27,21 +26,41 @@ build_image:
 
 unittest1:
   stage: test
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker run --rm -e "MODE=TEST1" $COMMIT_IMAGE_TAG
 
 unittest2:
   stage: test
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker run --rm -e "MODE=TEST2" $COMMIT_IMAGE_TAG
 
 release-image:
   stage: release
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $COMMIT_IMAGE_TAG
     - docker tag $COMMIT_IMAGE_TAG $LATEST_IMAGE_TAG
     - docker push $LATEST_IMAGE_TAG
   only:
     - master
+
+deploy-to-kubernetes
+  image: lapee79/kubectl-xenial:1.6.5
+  stage: deploy
+  before_script:
+   - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
+   - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
+   - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
+   - kubectl config use-context "$CI_PROJECT_ID"
+  script:
+    - kubectl cluster-info
+  only:
+    - master
+  when: manual
