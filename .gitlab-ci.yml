@@ -62,7 +62,7 @@ deploy-to-kubernetes:
     - echo $KUBE_URL
     - echo $KUBE_TOKEN
     - echo $KUBE_NAMESPACE
-    - kubectl cluster-info
+    - ls -l
   only:
     - master
   when: manual
